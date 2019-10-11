@@ -2,16 +2,17 @@
 id: 587d824d367417b2b2512c51
 title: Test if an Array Contains an Item
 challengeType: 2
+forumTopicId: 301603
 ---
 
 ## Description
 <section id='description'>
-As a reminder, this project is being built upon the following starter project on <a href='https://glitch.com/#!/import/github/freeCodeCamp/boilerplate-mochachai/'>Glitch</a>, or cloned from <a href='https://github.com/freeCodeCamp/boilerplate-mochachai/'>GitHub</a>.
+As a reminder, this project is being built upon the following starter project on <a href='https://glitch.com/edit/#!/remix/clone-from-repo?REPO_URL=https://github.com/freeCodeCamp/boilerplate-mochachai/'>Glitch</a>, or cloned from <a href='https://github.com/freeCodeCamp/boilerplate-mochachai/'>GitHub</a>.
 </section>
 
 ## Instructions
 <section id='instructions'>
-
+Use <code>assert.include()</code> or <code>assert.notInclude()</code> to make the tests pass. 
 </section>
 
 ## Tests
@@ -41,4 +42,5 @@ tests:
 ```js
 // solution required
 ```
+
 </section>
