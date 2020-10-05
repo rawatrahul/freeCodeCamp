@@ -23,12 +23,17 @@ const superBlockIntro = path.resolve(
   __dirname,
   '../../src/templates/Introduction/SuperBlockIntro.js'
 );
+const video = path.resolve(
+  __dirname,
+  '../../src/templates/Challenges/video/Show.js'
+);
 
 const views = {
   backend,
   classic,
   modern: classic,
-  frontend
+  frontend,
+  video
   // quiz: Quiz
 };
 
@@ -61,21 +66,24 @@ const getIntroIfRequired = (node, index, nodeArray) => {
 
 exports.createChallengePages = createPage => ({ node }, index, thisArray) => {
   const {
+    superBlock,
+    block,
     fields: { slug },
     required = [],
     template,
     challengeType,
     id
   } = node;
-  if (challengeType === 7) {
-    return null;
-  }
+  // TODO: challengeType === 7 and isPrivate are the same, right? If so, we
+  // should remove one of them.
 
   return createPage({
     path: slug,
     component: getTemplateComponent(challengeType),
     context: {
       challengeMeta: {
+        superBlock,
+        block: block,
         introPath: getIntroIfRequired(node, index, thisArray),
         template,
         required,

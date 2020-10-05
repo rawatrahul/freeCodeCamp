@@ -7,6 +7,8 @@ import ToolPanel from '../components/Tool-Panel';
 import { createStructuredSelector } from 'reselect';
 import { currentTabSelector, moveToTab } from '../redux';
 import { bindActionCreators } from 'redux';
+import EditorTabs from './EditorTabs';
+import { showUpcomingChanges } from '../../../../config/env.json';
 
 const mapStateToProps = createStructuredSelector({
   currentTab: currentTabSelector
@@ -33,6 +35,9 @@ const propTypes = {
 };
 
 class MobileLayout extends Component {
+  componentDidMount() {
+    if (this.props.currentTab !== 1) this.props.moveToTab(1);
+  }
   render() {
     const {
       currentTab,
@@ -63,6 +68,7 @@ class MobileLayout extends Component {
             {instructions}
           </TabPane>
           <TabPane eventKey={2} title='Code' {...editorTabPaneProps}>
+            {showUpcomingChanges && <EditorTabs />}
             {editor}
           </TabPane>
           <TabPane eventKey={3} title='Tests' {...editorTabPaneProps}>

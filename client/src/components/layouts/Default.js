@@ -6,13 +6,15 @@ import { createSelector } from 'reselect';
 import Helmet from 'react-helmet';
 import fontawesome from '@fortawesome/fontawesome';
 
-import ga from '../../analytics';
 import {
   fetchUser,
   isSignedInSelector,
   onlineStatusChange,
   isOnlineSelector,
-  userSelector
+  userFetchStateSelector,
+  userSelector,
+  usernameSelector,
+  executeGA
 } from '../../redux';
 import { flashMessageSelector, removeFlashMessage } from '../Flash/redux';
 
@@ -23,7 +25,18 @@ import OfflineWarning from '../OfflineWarning';
 import Flash from '../Flash';
 import Header from '../Header';
 import Footer from '../Footer';
+// preload common fonts
+import latoLightURL from '../../../static/fonts/lato/Lato-Light.woff';
+import latoRegularURL from '../../../static/fonts/lato/Lato-Regular.woff';
+import latoBoldURL from '../../../static/fonts/lato/Lato-Bold.woff';
+// eslint-disable-next-line max-len
+import robotoRegularURL from '../../../static/fonts/roboto-mono/RobotoMono-Regular.woff';
+// eslint-disable-next-line max-len
+import robotoBoldURL from '../../../static/fonts/roboto-mono/RobotoMono-Bold.woff';
+// eslint-disable-next-line max-len
+import robotoItalicURL from '../../../static/fonts/roboto-mono/RobotoMono-Italic.woff';
 
+import './fonts.css';
 import './global.css';
 import './variables.css';
 
@@ -57,6 +70,8 @@ const metaKeywords = [
 
 const propTypes = {
   children: PropTypes.node.isRequired,
+  executeGA: PropTypes.func,
+  fetchState: PropTypes.shape({ pending: PropTypes.bool }),
   fetchUser: PropTypes.func.isRequired,
   flashMessage: PropTypes.shape({
     id: PropTypes.string,
@@ -70,45 +85,53 @@ const propTypes = {
   pathname: PropTypes.string.isRequired,
   removeFlashMessage: PropTypes.func.isRequired,
   showFooter: PropTypes.bool,
-  theme: PropTypes.string
+  signedInUserName: PropTypes.string,
+  theme: PropTypes.string,
+  useTheme: PropTypes.bool,
+  user: PropTypes.object
 };
 
 const mapStateToProps = createSelector(
   isSignedInSelector,
   flashMessageSelector,
   isOnlineSelector,
+  userFetchStateSelector,
   userSelector,
-  (isSignedIn, flashMessage, isOnline, user) => ({
+  usernameSelector,
+  (isSignedIn, flashMessage, isOnline, fetchState, user) => ({
     isSignedIn,
     flashMessage,
     hasMessage: !!flashMessage.message,
     isOnline,
-    theme: user.theme
+    fetchState,
+    theme: user.theme,
+    user
   })
 );
+
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
-    { fetchUser, removeFlashMessage, onlineStatusChange },
+    { fetchUser, removeFlashMessage, onlineStatusChange, executeGA },
     dispatch
   );
 
 class DefaultLayout extends Component {
   componentDidMount() {
-    const { isSignedIn, fetchUser, pathname } = this.props;
+    const { isSignedIn, fetchUser, pathname, executeGA } = this.props;
     if (!isSignedIn) {
       fetchUser();
     }
-    ga.pageview(pathname);
+    executeGA({ type: 'page', data: pathname });
 
     window.addEventListener('online', this.updateOnlineStatus);
     window.addEventListener('offline', this.updateOnlineStatus);
   }
 
   componentDidUpdate(prevProps) {
-    const { pathname } = this.props;
+    const { pathname, executeGA } = this.props;
     const { pathname: prevPathname } = prevProps;
     if (pathname !== prevPathname) {
-      ga.pageview(pathname);
+      executeGA({ type: 'page', data: pathname });
     }
   }
 
@@ -128,33 +151,82 @@ class DefaultLayout extends Component {
     const {
       children,
       hasMessage,
+      fetchState,
       flashMessage,
       isOnline,
       isSignedIn,
       removeFlashMessage,
       showFooter = true,
-      theme = 'default'
+      theme = 'default',
+      user,
+      useTheme = true,
+      pathname
     } = this.props;
+
     return (
       <Fragment>
         <Helmet
           bodyAttributes={{
-            class: `${theme === 'default' ? 'light-palette' : 'dark-palette'}`
+            class: useTheme
+              ? `${theme === 'default' ? 'light-palette' : 'dark-palette'}`
+              : 'light-palette'
           }}
           meta={[
             {
               name: 'description',
-              content:
-                'Learn to code with free online courses, programming ' +
-                'projects, and interview preparation for developer jobs.'
+              content: `Learn to code at home. Build projects. Earn certifications. Since 2014,
+                 more than 40,000 freeCodeCamp.org graduates have gotten jobs at tech
+                 companies including Google, Apple, Amazon, and Microsoft.`
             },
             { name: 'keywords', content: metaKeywords.join(', ') }
           ]}
         >
+          <link
+            as='font'
+            crossOrigin='anonymous'
+            href={latoRegularURL}
+            rel='preload'
+            type='font/woff'
+          />
+          <link
+            as='font'
+            crossOrigin='anonymous'
+            href={latoLightURL}
+            rel='preload'
+            type='font/woff'
+          />
+          <link
+            as='font'
+            crossOrigin='anonymous'
+            href={latoBoldURL}
+            rel='preload'
+            type='font/woff'
+          />
+          <link
+            as='font'
+            crossOrigin='anonymous'
+            href={robotoRegularURL}
+            rel='preload'
+            type='font/woff'
+          />
+          <link
+            as='font'
+            crossOrigin='anonymous'
+            href={robotoBoldURL}
+            rel='preload'
+            type='font/woff'
+          />
+          <link
+            as='font'
+            crossOrigin='anonymous'
+            href={robotoItalicURL}
+            rel='preload'
+            type='font/woff'
+          />
           <style>{fontawesome.dom.css()}</style>
         </Helmet>
         <WithInstantSearch>
-          <Header />
+          <Header fetchState={fetchState} pathName={pathname} user={user} />
           <div className={`default-layout`}>
             <OfflineWarning isOnline={isOnline} isSignedIn={isSignedIn} />
             {hasMessage && flashMessage ? (

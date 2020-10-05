@@ -83,9 +83,9 @@ export const loginRedirect = () => {
     const successRedirect = req => {
       if (!!req && req.session && req.session.returnTo) {
         delete req.session.returnTo;
-        return `${homeLocation}/`;
+        return `${homeLocation}/learn`;
       }
-      return `${homeLocation}/`;
+      return `${homeLocation}/learn`;
     };
 
     let redirect = url.parse(successRedirect(req), true);
@@ -101,6 +101,10 @@ export const createPassportCallbackAuthenticator = (strategy, config) => (
   res,
   next
 ) => {
+  const returnTo =
+    req && req.query && req.query.state
+      ? Buffer.from(req.query.state, 'base64').toString('utf-8')
+      : `${homeLocation}/learn`;
   return passport.authenticate(
     strategy,
     { session: false },
@@ -112,7 +116,7 @@ export const createPassportCallbackAuthenticator = (strategy, config) => (
       if (!user || !userInfo) {
         return res.redirect('/signin');
       }
-      const redirect = `${homeLocation}/learn`;
+      const redirect = `${returnTo}`;
 
       const { accessToken } = userInfo;
       const { provider } = config;
@@ -136,7 +140,12 @@ we recommend using your email address: ${user.email} to sign in instead.
         setAccessTokenToResponse({ accessToken }, req, res);
         req.login(user);
       }
-      return res.redirectWithFlash(redirect);
+      // TODO: enable 'returnTo' for sign-up
+      if (user.acceptedPrivacyTerms) {
+        return res.redirectWithFlash(redirect);
+      } else {
+        return res.redirectWithFlash(`${homeLocation}/email-sign-up`);
+      }
     }
   )(req, res, next);
 };

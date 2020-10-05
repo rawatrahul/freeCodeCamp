@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Panel } from '@freecodecamp/react-bootstrap';
 
@@ -10,42 +10,41 @@ import './honesty.css';
 
 const propTypes = {
   isHonest: PropTypes.bool,
-  policy: PropTypes.arrayOf(PropTypes.string),
   updateIsHonest: PropTypes.func.isRequired
 };
 
-class Honesty extends Component {
-  handleAgreeClick = () => this.props.updateIsHonest({ isHonest: true });
-
-  renderAgreeButton = () => (
-    <Button block={true} bsStyle='primary' onClick={this.handleAgreeClick}>
+const Honesty = ({ isHonest, updateIsHonest }) => {
+  const button = isHonest ? (
+    <Button
+      block={true}
+      bsStyle='primary'
+      className='disabled-agreed'
+      disabled={true}
+    >
+      <p>You have accepted our Academic Honesty Policy.</p>
+    </Button>
+  ) : (
+    <Button
+      block={true}
+      bsStyle='primary'
+      onClick={() => updateIsHonest({ isHonest: true })}
+    >
       Agree
     </Button>
   );
-
-  renderIsHonestAgreed = () => (
-    <Panel bsStyle='info' className='agreed btn'>
-      <p>You have accepted our Academic Honesty Policy.</p>
-    </Panel>
+  return (
+    <section className='honesty-policy'>
+      <SectionHeader>Academic Honesty Policy</SectionHeader>
+      <FullWidthRow>
+        <Panel className='honesty-panel'>
+          <HonestyPolicy />
+        </Panel>
+        <br />
+        {button}
+      </FullWidthRow>
+    </section>
   );
-
-  render() {
-    const { isHonest } = this.props;
-
-    return (
-      <section className='honesty-policy'>
-        <SectionHeader>Academic Honesty Policy</SectionHeader>
-        <FullWidthRow>
-          <Panel className='honesty-panel'>
-            <HonestyPolicy />
-          </Panel>
-          <br />
-          {isHonest ? this.renderIsHonestAgreed() : this.renderAgreeButton()}
-        </FullWidthRow>
-      </section>
-    );
-  }
-}
+};
 
 Honesty.displayName = 'Honesty';
 Honesty.propTypes = propTypes;

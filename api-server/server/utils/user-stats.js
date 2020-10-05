@@ -110,9 +110,7 @@ export function getUserById(id, User = loopback.getModelByType('User')) {
       if (err || isEmpty(instance)) {
         return reject(err || 'No user instance found');
       }
-      instance.points =
-        (instance.progressTimestamps && instance.progressTimestamps.length) ||
-        1;
+
       let completedChallengeCount = 0;
       let completedProjectCount = 0;
       if ('completedChallenges' in instance) {
@@ -126,12 +124,14 @@ export function getUserById(id, User = loopback.getModelByType('User')) {
           }
         });
       }
+
       instance.completedChallengeCount = completedChallengeCount;
       instance.completedProjectCount = completedProjectCount;
       instance.completedCertCount = getCompletedCertCount(instance);
       instance.completedLegacyCertCount = getLegacyCertCount(instance);
-      instance.completedChallenges = [];
-      delete instance.progressTimestamps;
+      instance.points =
+        (instance.progressTimestamps && instance.progressTimestamps.length) ||
+        1;
       return resolve(instance);
     })
   );
@@ -142,15 +142,21 @@ function getCompletedCertCount(user) {
     'isApisMicroservicesCert',
     'is2018DataVisCert',
     'isFrontEndLibsCert',
-    'isInfosecQaCert',
+    'isQaCertV7',
+    'isInfosecCertV7',
     'isJsAlgoDataStructCert',
-    'isRespWebDesignCert'
+    'isRespWebDesignCert',
+    'isSciCompPyCertV7',
+    'isDataAnalysisPyCertV7',
+    'isMachineLearningPyCertV7'
   ].reduce((sum, key) => (user[key] ? sum + 1 : sum), 0);
 }
 
 function getLegacyCertCount(user) {
-  return ['isFrontEndCert', 'isBackEndCert', 'isDataVisCert'].reduce(
-    (sum, key) => (user[key] ? sum + 1 : sum),
-    0
-  );
+  return [
+    'isFrontEndCert',
+    'isBackEndCert',
+    'isDataVisCert',
+    'isInfosecQaCert'
+  ].reduce((sum, key) => (user[key] ? sum + 1 : sum), 0);
 }

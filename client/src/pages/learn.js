@@ -1,24 +1,20 @@
 import React from 'react';
-import { Grid, Row, Col } from '@freecodecamp/react-bootstrap';
+import { Grid } from '@freecodecamp/react-bootstrap';
 import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import { graphql } from 'gatsby';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 
+import LearnLayout from '../components/layouts/Learn';
+import { dasherize } from '../../../utils/slugs';
+import Map from '../components/Map';
+import Intro from '../components/Intro';
 import {
   userFetchStateSelector,
   isSignedInSelector,
   userSelector
 } from '../redux';
-
-import LearnLayout from '../components/layouts/Learn';
-import Login from '../components/Header/components/Login';
-import { Link, Spacer } from '../components/helpers';
-import Map from '../components/Map';
-import Welcome from '../components/welcome';
-import { dasherize } from '../../../utils/slugs';
-
 import {
   ChallengeNode,
   AllChallengeNode,
@@ -52,24 +48,10 @@ const propTypes = {
   location: PropTypes.object,
   state: PropTypes.object,
   user: PropTypes.shape({
-    name: PropTypes.string
+    name: PropTypes.string,
+    username: PropTypes.string,
+    completedChallengeCount: PropTypes.number
   })
-};
-
-const BigCallToAction = isSignedIn => {
-  if (!isSignedIn) {
-    return (
-      <>
-        <Row>
-          <Col sm={10} smOffset={1} xs={12}>
-            <Spacer />
-            <Login>Sign in to save your progress.</Login>
-          </Col>
-        </Row>
-      </>
-    );
-  }
-  return '';
 };
 
 // choose between the state from landing page and hash from url.
@@ -82,7 +64,8 @@ const hashValueSelector = (state, hash) => {
 export const LearnPage = ({
   location: { hash = '', state = '' },
   isSignedIn,
-  user: { name = '' },
+  fetchState: { pending, complete },
+  user: { name = '', completedChallengeCount = 0 },
   data: {
     challengeNode: {
       fields: { slug }
@@ -94,22 +77,20 @@ export const LearnPage = ({
   const hashValue = hashValueSelector(state, hash);
   return (
     <LearnLayout>
-      <Helmet title='Learn | freeCodeCamp.org' />
+      <Helmet title='Learn to code at home | freeCodeCamp.org' />
       <Grid>
-        <Welcome name={name} />
-        <Row className='text-center'>
-          <Col sm={10} smOffset={1} xs={12}>
-            {BigCallToAction(isSignedIn)}
-            <Spacer />
-            <h3>
-              If you are new to coding, we recommend you{' '}
-              <Link to={slug}>start at the beginning</Link>.
-            </h3>
-          </Col>
-        </Row>
+        <Intro
+          complete={complete}
+          completedChallengeCount={completedChallengeCount}
+          isSignedIn={isSignedIn}
+          name={name}
+          pending={pending}
+          slug={slug}
+        />
         <Map
           hash={hashValue}
           introNodes={mdEdges.map(({ node }) => node)}
+          isSignedIn={isSignedIn}
           nodes={edges
             .map(({ node }) => node)
             .filter(({ isPrivate }) => !isPrivate)}
@@ -141,7 +122,6 @@ export const query = graphql`
           id
           block
           title
-          isRequired
           superBlock
           dashedName
         }

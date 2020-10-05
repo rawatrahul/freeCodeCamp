@@ -1,5 +1,5 @@
 .notfound-page-wrapper {
-  min-height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -30,7 +30,7 @@
 
 .quote-wrapper span {
   font-size: 50px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--tertiary-color);
   font-family: 'Arial', sans-serif;
   font-style: normal;

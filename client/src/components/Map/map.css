@@ -20,6 +20,7 @@ button.map-title {
   background: transparent;
   border: none;
   text-align: left;
+  width: 100%;
 }
 
 button.map-title:hover {
@@ -33,7 +34,7 @@ button.map-title:hover {
 
 .map-title-completed {
   margin-left: auto;
-  width: 100px;
+  min-width: 100px;
   padding-left: 20px;
 }
 
@@ -52,7 +53,10 @@ li.open > .map-title svg:first-child {
 .map-challenge-title {
   display: flex;
   margin-bottom: 0.25rem;
-  max-width: calc(100% - 105px);
+}
+
+.map-challenge-title a {
+  width: 100%;
 }
 
 @media (max-width: 640px) {

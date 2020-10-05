@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { Grid, Button } from '@freecodecamp/react-bootstrap';
@@ -11,12 +10,12 @@ import {
   signInLoadingSelector,
   userSelector,
   isSignedInSelector,
-  hardGoTo
+  hardGoTo as navigate
 } from '../redux';
 import { submitNewAbout, updateUserFlag, verifyCert } from '../redux/settings';
 import { createFlashMessage } from '../components/Flash/redux';
 
-import { FullWidthRow, Link, Loader, Spacer } from '../components/helpers';
+import { FullWidthRow, Loader, Spacer } from '../components/helpers';
 import About from '../components/settings/About';
 import Privacy from '../components/settings/Privacy';
 import Email from '../components/settings/Email';
@@ -28,7 +27,6 @@ import DangerZone from '../components/settings/DangerZone';
 
 const propTypes = {
   createFlashMessage: PropTypes.func.isRequired,
-  hardGoTo: PropTypes.func.isRequired,
   isSignedIn: PropTypes.bool.isRequired,
   navigate: PropTypes.func.isRequired,
   showLoading: PropTypes.bool.isRequired,
@@ -62,8 +60,13 @@ const propTypes = {
     isFullStackCert: PropTypes.bool,
     isHonest: PropTypes.bool,
     isInfosecQaCert: PropTypes.bool,
+    isQaCertV7: PropTypes.bool,
+    isInfosecCertV7: PropTypes.bool,
     isJsAlgoDataStructCert: PropTypes.bool,
     isRespWebDesignCert: PropTypes.bool,
+    isSciCompPyCertV7: PropTypes.bool,
+    isDataAnalysisPyCertV7: PropTypes.bool,
+    isMachineLearningPyCertV7: PropTypes.bool,
     linkedin: PropTypes.string,
     location: PropTypes.string,
     name: PropTypes.string,
@@ -98,32 +101,21 @@ const mapStateToProps = createSelector(
   })
 );
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(
-    {
-      createFlashMessage,
-      hardGoTo,
-      navigate: location => dispatch(hardGoTo(location)),
-      submitNewAbout,
-      toggleNightMode: theme => updateUserFlag({ theme }),
-      updateInternetSettings: updateUserFlag,
-      updateIsHonest: updateUserFlag,
-      updatePortfolio: updateUserFlag,
-      updateQuincyEmail: sendQuincyEmail => updateUserFlag({ sendQuincyEmail }),
-      verifyCert
-    },
-    dispatch
-  );
-
-const createHandleSignoutClick = hardGoTo => e => {
-  e.preventDefault();
-  return hardGoTo(`${apiLocation}/signout`);
+const mapDispatchToProps = {
+  createFlashMessage,
+  navigate,
+  submitNewAbout,
+  toggleNightMode: theme => updateUserFlag({ theme }),
+  updateInternetSettings: updateUserFlag,
+  updateIsHonest: updateUserFlag,
+  updatePortfolio: updateUserFlag,
+  updateQuincyEmail: sendQuincyEmail => updateUserFlag({ sendQuincyEmail }),
+  verifyCert
 };
 
 export function ShowSettings(props) {
   const {
     createFlashMessage,
-    hardGoTo,
     isSignedIn,
     submitNewAbout,
     toggleNightMode,
@@ -137,9 +129,14 @@ export function ShowSettings(props) {
       isDataVisCert,
       isFrontEndCert,
       isInfosecQaCert,
+      isQaCertV7,
+      isInfosecCertV7,
       isFrontEndLibsCert,
       isFullStackCert,
       isRespWebDesignCert,
+      isSciCompPyCertV7,
+      isDataAnalysisPyCertV7,
+      isMachineLearningPyCertV7,
       isEmailVerified,
       isHonest,
       sendQuincyEmail,
@@ -169,38 +166,32 @@ export function ShowSettings(props) {
     return <Loader fullScreen={true} />;
   }
 
-  if (!showLoading && !isSignedIn) {
-    return navigate(`${apiLocation}/signin`);
+  if (!isSignedIn) {
+    navigate(`${apiLocation}/signin?returnTo=settings`);
+    return <Loader fullScreen={true} />;
   }
 
   return (
     <Fragment>
-      <Helmet>
-        <title>Settings | freeCodeCamp.org</title>
-      </Helmet>
+      <Helmet title='Settings | freeCodeCamp.org'></Helmet>
       <Grid>
         <main>
           <Spacer size={2} />
           <FullWidthRow>
-            <Link
-              className='btn-invert btn btn-lg btn-primary btn-block'
-              to={`/${username}`}
-            >
-              Show me my public portfolio
-            </Link>
             <Button
               block={true}
               bsSize='lg'
               bsStyle='primary'
               className='btn-invert'
-              href={'/signout'}
-              onClick={createHandleSignoutClick(hardGoTo)}
+              href={`${apiLocation}/signout`}
             >
               Sign me out of freeCodeCamp
             </Button>
           </FullWidthRow>
           <Spacer />
-          <h1 className='text-center'>{`Account Settings for ${username}`}</h1>
+          <h1 className='text-center' style={{ overflowWrap: 'break-word' }}>
+            {`Account Settings for ${username}`}
+          </h1>
           <About
             about={about}
             currentTheme={theme}
@@ -240,14 +231,19 @@ export function ShowSettings(props) {
             is2018DataVisCert={is2018DataVisCert}
             isApisMicroservicesCert={isApisMicroservicesCert}
             isBackEndCert={isBackEndCert}
+            isDataAnalysisPyCertV7={isDataAnalysisPyCertV7}
             isDataVisCert={isDataVisCert}
             isFrontEndCert={isFrontEndCert}
             isFrontEndLibsCert={isFrontEndLibsCert}
             isFullStackCert={isFullStackCert}
             isHonest={isHonest}
+            isInfosecCertV7={isInfosecCertV7}
             isInfosecQaCert={isInfosecQaCert}
             isJsAlgoDataStructCert={isJsAlgoDataStructCert}
+            isMachineLearningPyCertV7={isMachineLearningPyCertV7}
+            isQaCertV7={isQaCertV7}
             isRespWebDesignCert={isRespWebDesignCert}
+            isSciCompPyCertV7={isSciCompPyCertV7}
             username={username}
             verifyCert={verifyCert}
           />

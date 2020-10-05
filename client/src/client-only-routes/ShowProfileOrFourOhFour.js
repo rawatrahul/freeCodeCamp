@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { isEmpty } from 'lodash';
 
@@ -43,8 +42,9 @@ const makeMapStateToProps = () => (state, props) => {
   };
 };
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({ fetchProfileForUser }, dispatch);
+const mapDispatchToProps = {
+  fetchProfileForUser
+};
 
 class ShowProfileOrFourOhFour extends Component {
   componentDidMount() {

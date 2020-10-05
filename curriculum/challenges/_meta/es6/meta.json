@@ -1,5 +1,6 @@
 {
   "name": "ES6",
+  "isUpcomingChange": false,
   "dashedName": "es6",
   "order": 2,
   "time": "5 hours",
@@ -102,7 +103,7 @@
     ],
     [
       "587d7b8c367417b2b2512b55",
-      "Reuse Javascript Code Using import"
+      "Reuse JavaScript Code Using import"
     ],
     [
       "587d7b8c367417b2b2512b57",

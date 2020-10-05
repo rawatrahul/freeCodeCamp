@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Row, Col } from '@freecodecamp/react-bootstrap';
+import { Grid, Row, Button } from '@freecodecamp/react-bootstrap';
 import Helmet from 'react-helmet';
 import Link from '../helpers/Link';
 
@@ -10,6 +10,7 @@ import HeatMap from './components/HeatMap';
 import Certifications from './components/Certifications';
 import Portfolio from './components/Portfolio';
 import Timeline from './components/TimeLine';
+import { apiLocation } from '../../../config/env.json';
 
 const propTypes = {
   isSessionUser: PropTypes.bool,
@@ -18,6 +19,7 @@ const propTypes = {
       isLocked: PropTypes.bool,
       showAbout: PropTypes.bool,
       showCerts: PropTypes.bool,
+      showDonation: PropTypes.bool,
       showHeatMap: PropTypes.bool,
       showLocation: PropTypes.bool,
       showName: PropTypes.bool,
@@ -26,10 +28,6 @@ const propTypes = {
       showTimeLine: PropTypes.bool
     }),
     calendar: PropTypes.object,
-    streak: PropTypes.shape({
-      current: PropTypes.number,
-      longest: PropTypes.number
-    }),
     completedChallenges: PropTypes.array,
     portfolio: PropTypes.array,
     about: PropTypes.string,
@@ -38,6 +36,7 @@ const propTypes = {
     isLinkedIn: PropTypes.bool,
     isTwitter: PropTypes.bool,
     isWebsite: PropTypes.bool,
+    joinDate: PropTypes.string,
     linkedin: PropTypes.string,
     location: PropTypes.string,
     name: PropTypes.string,
@@ -46,7 +45,8 @@ const propTypes = {
     twitter: PropTypes.string,
     username: PropTypes.string,
     website: PropTypes.string,
-    yearsTopContributor: PropTypes.array
+    yearsTopContributor: PropTypes.array,
+    isDonating: PropTypes.bool
   })
 };
 
@@ -54,12 +54,14 @@ function renderMessage(isSessionUser, username) {
   return isSessionUser ? (
     <Fragment>
       <FullWidthRow>
-        <h2 className='text-center'>You have not made your profile public.</h2>
+        <h2 className='text-center'>
+          You have not made your portfolio public.
+        </h2>
       </FullWidthRow>
       <FullWidthRow>
         <p className='alert alert-info'>
-          You need to change your privacy setting in order for your profile to
-          be seen by others. This is a preview of how your profile will look
+          You need to change your privacy setting in order for your portfolio to
+          be seen by others. This is a preview of how your portfolio will look
           when made public.
         </p>
       </FullWidthRow>
@@ -68,14 +70,14 @@ function renderMessage(isSessionUser, username) {
   ) : (
     <Fragment>
       <FullWidthRow>
-        <h2 className='text-center'>
-          {username} has not made their profile public.
+        <h2 className='text-center' style={{ overflowWrap: 'break-word' }}>
+          {username} has not made their portfolio public.
         </h2>
       </FullWidthRow>
       <FullWidthRow>
         <p className='alert alert-info'>
           {username} needs to change their privacy setting in order for you to
-          view their profile.
+          view their portfolio.
         </p>
       </FullWidthRow>
       <Spacer />
@@ -92,6 +94,7 @@ function renderProfile(user) {
     profileUI: {
       showAbout = false,
       showCerts = false,
+      showDonation = false,
       showHeatMap = false,
       showLocation = false,
       showName = false,
@@ -101,7 +104,6 @@ function renderProfile(user) {
     },
     calendar,
     completedChallenges,
-    streak,
     githubProfile,
     isLinkedIn,
     isGithub,
@@ -112,12 +114,14 @@ function renderProfile(user) {
     website,
     name,
     username,
+    joinDate,
     location,
     points,
     picture,
     portfolio,
     about,
-    yearsTopContributor
+    yearsTopContributor,
+    isDonating
   } = user;
 
   return (
@@ -125,10 +129,12 @@ function renderProfile(user) {
       <Camper
         about={showAbout ? about : null}
         githubProfile={githubProfile}
+        isDonating={showDonation ? isDonating : null}
         isGithub={isGithub}
         isLinkedIn={isLinkedIn}
         isTwitter={isTwitter}
         isWebsite={isWebsite}
+        joinDate={showAbout ? joinDate : null}
         linkedin={linkedin}
         location={showLocation ? location : null}
         name={showName ? name : null}
@@ -139,7 +145,7 @@ function renderProfile(user) {
         website={website}
         yearsTopContributor={yearsTopContributor}
       />
-      {showHeatMap ? <HeatMap calendar={calendar} streak={streak} /> : null}
+      {showHeatMap ? <HeatMap calendar={calendar} /> : null}
       {showCerts ? <Certifications username={username} /> : null}
       {showPortfolio ? <Portfolio portfolio={portfolio} /> : null}
       {showTimeLine ? (
@@ -164,20 +170,29 @@ function Profile({ user, isSessionUser }) {
       <Spacer />
       <Grid>
         {isSessionUser ? (
-          <Row>
-            <Col sm={4} smOffset={4}>
-              <Link className='btn btn-lg btn-primary btn-block' to='/settings'>
-                Update my settings
-              </Link>
-            </Col>
-          </Row>
+          <FullWidthRow className='button-group'>
+            <Link className='btn btn-lg btn-primary btn-block' to='/settings'>
+              Update my account settings
+            </Link>
+            <Button
+              block={true}
+              bsSize='lg'
+              bsStyle='primary'
+              className='btn-invert'
+              href={`${apiLocation}/signout`}
+            >
+              Sign me out of freeCodeCamp
+            </Button>
+          </FullWidthRow>
         ) : null}
         <Spacer />
         {isLocked ? renderMessage(isSessionUser, username) : null}
         {!isLocked || isSessionUser ? renderProfile(user) : null}
         {isSessionUser ? null : (
           <Row className='text-center'>
-            <Link to={`/user/${username}/report-user`}>Report This User</Link>
+            <Link to={`/user/${username}/report-user`}>
+              Flag This User's Account for Abuse
+            </Link>
           </Row>
         )}
         <Spacer />

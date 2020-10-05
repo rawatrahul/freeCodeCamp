@@ -12,7 +12,10 @@ export const UniversalNav = ({
   displayMenu,
   toggleDisplayMenu,
   menuButtonRef,
-  searchBarRef
+  searchBarRef,
+  pathName,
+  user,
+  fetchState
 }) => (
   <nav
     className={'universal-nav nav-padding' + (displayMenu ? ' expand-nav' : '')}
@@ -24,12 +27,18 @@ export const UniversalNav = ({
       <SearchBar innerRef={searchBarRef} />
     </div>
     <div className='universal-nav-middle'>
-      <Link id='universal-nav-logo' to='/'>
+      <Link id='universal-nav-logo' to='/learn'>
         <NavLogo />
+        <span className='sr-only'>freeCodeCamp.org</span>
       </Link>
     </div>
     <div className='universal-nav-right main-nav'>
-      <NavLinks displayMenu={displayMenu} />
+      <NavLinks
+        displayMenu={displayMenu}
+        fetchState={fetchState}
+        pathName={pathName}
+        user={user}
+      />
     </div>
     <MenuButton
       displayMenu={displayMenu}
@@ -44,7 +53,10 @@ export default UniversalNav;
 
 UniversalNav.propTypes = {
   displayMenu: PropTypes.bool,
+  fetchState: PropTypes.shape({ pending: PropTypes.bool }),
   menuButtonRef: PropTypes.object,
+  pathName: PropTypes.string.isRequired,
   searchBarRef: PropTypes.object,
-  toggleDisplayMenu: PropTypes.func
+  toggleDisplayMenu: PropTypes.func,
+  user: PropTypes.object
 };
